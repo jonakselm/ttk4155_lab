@@ -15,6 +15,10 @@ void uart_init( unsigned int ubrr )
 
 void uart_transmit( unsigned char data )
 {
+    if (data == '\n')
+    {
+        uart_transmit('\r');
+    }
     /* Wait for empty transmit buffer */
     while ( !( UCSR0A & (1<<UDRE0)) )
         ;
