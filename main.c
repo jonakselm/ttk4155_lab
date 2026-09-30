@@ -7,9 +7,12 @@
 #include <stdio.h>
 #include "sram_test.h"
 #include "helpers.h"
+#include "gamepad.h"
 
 #define EVER ;;
 
+enum ADC { ADC_A0, ADC_A1, ADC_A2, ADC_PD,
+    ADC_INH, ADC_BIP, ADC_DIFF, ADC_ALL };
 
 int main()
 {
@@ -22,26 +25,32 @@ int main()
     
     // Enable external SRAM/XMEM
     MCUCR |= 1 << SRE;
-    // Disable high-order bits for use by JTAG
+    // Disable high-order bits in use by JTAG
     SFIOR = 1 << XMM2;
 
-    volatile char *ext_ram = (char *) 0x1800; 
+    //////////
+    // Timer OC1A setup
+    DDRD |= (1 << 5);
+    TCCR1A = (1 << COM1A1) | (0 << COM1A0) | (1 << WGM11) | (0 << WGM10);
+    TCCR1B = (1 << WGM13) | (0 << WGM12) | (0 << CS12) | (0 << CS11) | (1 << CS10);
 
-    // DDRE = 1;
-    TCCR1B = (0 << WGM13) | (1 << WGM12) | (0 << CS12) | (0 << CS11) | (1 << CS10);
+    ICR1 = 2;
+    OCR1A = 1;
+    // End Timer setup
+    //////////CH1
 
-    // unsigned char c = 0b00010001;
-    int addr = 0;
-    unsigned char c = 0;
+    Gamepad gp;
+    volatile char *adc_mmio = (char *) 0x1000; 
+    CalibrationData cd;
+    calibrate(adc_mmio, &cd);
+
     for (EVER)
     {
-        SRAM_test();       
-        // PORTB ^= 1;
-        // ext_ram[addr] = c;
-        // unsigned char ch = ext_ram[addr];
-        // printf("Teller: "BYTE_TO_BINARY_PATTERN"\n", BYTE_TO_BINARY(c));
-        // printf("SRAM:   "BYTE_TO_BINARY_PATTERN"\n\n", BYTE_TO_BINARY(ch));
-        // _delay_ms(100);
-        // c--;
+        readCalibrated(adc_mmio, &cd, &gp);
+        printf("ADC:    %3i, %3i, %3i, %3i\r",
+                gp.joyX, gp.joyY, gp.touchX, gp.touchY);
+        // printf("ADC:    %3i%%, %3i%%, %3i%%, %3i%%\r", valueToPercentage(gp.joyX),
+        //         valueToPercentage(gp.joyY), valueToPercentage(gp.touchX),
+        //         valueToPercentage(gp.touchY));
     }
 }
