@@ -18,5 +18,15 @@
     "directory": "/home/student/Documents/noge",
     "file": "/home/student/Documents/noge/gamepad.c",
     "command": "/usr/bin/avr-gcc main.c -I /usr/lib/avr/include -std=c11 -D __AVR_ATmega162__"
+},
+{
+    "directory": "/home/student/Documents/noge",
+    "file": "/home/student/Documents/noge/spi.c",
+    "command": "/usr/bin/avr-gcc main.c -I /usr/lib/avr/include -std=c11 -D __AVR_ATmega162__"
+},
+{
+    "directory": "/home/student/Documents/noge",
+    "file": "/home/student/Documents/noge/oled.c",
+    "command": "/usr/bin/avr-gcc main.c -I /usr/lib/avr/include -std=c11 -D __AVR_ATmega162__"
 }
 ]

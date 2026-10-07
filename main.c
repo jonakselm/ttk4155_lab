@@ -1,4 +1,4 @@
-#define F_CPU 4915200
+#include "pch.h"
 #define BAUD 9600
 #define UBRR ((F_CPU / BAUD / 16) - 1)
 #include <avr/io.h>
@@ -8,6 +8,8 @@
 #include "sram_test.h"
 #include "helpers.h"
 #include "gamepad.h"
+#include "spi.h"
+#include "oled.h"
 
 #define EVER ;;
 
@@ -16,13 +18,15 @@ enum ADC { ADC_A0, ADC_A1, ADC_A2, ADC_PD,
 
 int main()
 {
-    DDRB = 1;
     PORTB = 1;
     uart_init(UBRR);
     uart_link_printf();
     printf("\n\nUART initialized\n");
     _delay_ms(1);
-    
+    SPI_MasterInit();
+    oledInit();
+    oledSetFullWindow();
+    oledWriteCmd(0xAF);
     // Enable external SRAM/XMEM
     MCUCR |= 1 << SRE;
     // Disable high-order bits in use by JTAG
@@ -39,16 +43,25 @@ int main()
     // End Timer setup
     //////////CH1
 
-    Gamepad gp;
-    volatile char *adc_mmio = (char *) 0x1000; 
-    CalibrationData cd;
-    calibrate(adc_mmio, &cd);
+    // Gamepad gp;
+    // volatile char *adc_mmio = (char *) 0x1000; 
+    // CalibrationData cd;
+    // calibrate(adc_mmio, &cd);
+    int c = 0;
 
     for (EVER)
     {
-        readCalibrated(adc_mmio, &cd, &gp);
-        printf("ADC:    %3i, %3i, %3i, %3i\r",
-                gp.joyX, gp.joyY, gp.touchX, gp.touchY);
+
+        c++;
+        _delay_ms(200);
+        // ssd1309_WriteCommand(0xA5);
+        // _delay_ms(20);
+        // ssd1309_WriteCommand(0x55);
+        // ssd1309_WriteData(0xAA);
+        // _delay_ms(20);
+        // readCalibrated(adc_mmio, &cd, &gp);
+        // printf("ADC:    %3i, %3i, %3i, %3i\r",
+        //         gp.joyX, gp.joyY, gp.touchX, gp.touchY);
         // printf("ADC:    %3i%%, %3i%%, %3i%%, %3i%%\r", valueToPercentage(gp.joyX),
         //         valueToPercentage(gp.joyY), valueToPercentage(gp.touchX),
         //         valueToPercentage(gp.touchY));
