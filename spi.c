@@ -14,8 +14,8 @@ void SPI_MasterInit(void)
     DDRB |= (1 << PB_MOSI) | (1 << PB_SCK) | (1 << PB_SS);
     PORTB &= ~(1 << PB_SS);
     DDRB &= ~(1 << PB_MISO);
-    /* Enable SPI, Master, set clock rate fck/16, MSB first, rising edge */
-    SPCR = (1 << SPE) | (0 << DORD) | (1 << MSTR) | (0 << CPOL) | (1 << SPR0);
+    /* Enable SPI, Master, set clock rate fck/4, MSB first, rising edge */
+    SPCR = (1 << SPE) | (0 << DORD) | (1 << MSTR) | (0 << CPOL) | (0 << SPR0);
 }
 void SPI_MasterTransmit(char cData)
 {

@@ -1,3 +1,4 @@
+#include "framebuffer.h"
 #define F_CPU 4915200
 #include "gamepad.h"
 #include <avr/io.h>
@@ -6,6 +7,7 @@
 #include "helpers.h"
 #include <stdlib.h>
 #include <stdint.h>
+#include "oled_text.h"
 
 #define BUSY PB1
 
@@ -29,12 +31,14 @@ int hasMoved(Gamepad *gp, Gamepad *prevGp, int index)
     {
     case 0:
     case 1:
-        printf("%i\r", abs((char)gp->joyX - (char)prevGp->joyX));
+        oledFbClear();
+        oled_printf("%i\r", abs((char)gp->joyX - (char)prevGp->joyX));
+        oledFbFlush();
         return abs((char)gp->joyX - (char)prevGp->joyX) > movedThreshold;
         break;
     case 2:
     case 3:
-        printf("%i\r", abs((char)gp->joyY - (char)prevGp->joyY));
+        oled_printf("%i\r", abs((char)gp->joyY - (char)prevGp->joyY));
         return abs((char)gp->joyY - (char)prevGp->joyY) > movedThreshold;
         break;
     case 4:
@@ -53,47 +57,62 @@ void calibrate(volatile char *address, CalibrationData *cd)
     readGamepad(address, &gp);
     for (int i = 0; i < 5; i++)
     {
-        printf("Move!\n");
+        oledFbClear();
+        oledTextCursor(0, 0);
+        oled_printf("Move!\n");
+        oledFbFlush();
         do
         {
             prevGp = gp;
             readGamepad(address, &gp);
         } while (!hasMoved(&gp, &prevGp, i));
+        _delay_ms(200);
 
-        printf("Hold it!\n");
+        oledFbClear();
+        oledTextCursor(0, 0);
+        oled_printf("Hold it!\n");
+        oledFbFlush();
         for (unsigned int j = 0; j < 50000u; j++)
         {
             readGamepad(address, &gp);
         }
-
+        
+        oledFbClear();
+        oledTextCursor(0, 0);
         switch (i)
         {
         case 0:
             cd->joyMinX = gp.joyX;
-            printf("X min is: %3i\n", cd->joyMinX);
+            oled_printf("X min is: %3i\n", cd->joyMinX);
             break;
         case 1:
             cd->joyMaxX = gp.joyX;
-            printf("X max is: %3i\n", cd->joyMaxX);
+            oled_printf("X max is: %3i\n", cd->joyMaxX);
             break;
         case 2:
             cd->joyMinY = gp.joyY;
-            printf("Y min is: %3i\n", cd->joyMinY);
+            oled_printf("Y min is: %3i\n", cd->joyMinY);
             break;
         case 3:
             cd->joyMaxY = gp.joyY;
-            printf("Y max is: %3i\n", cd->joyMaxY);
+            oled_printf("Y max is: %3i\n", cd->joyMaxY);
             break;
         case 4:
             cd->centerX = gp.joyX;
             cd->centerY = gp.joyY;
-            printf("Center is: %3i, %3i\n\n", cd->centerX, cd->centerY);
+            oled_printf("Center is: %3i, %3i\n\n", cd->centerX, cd->centerY);
             break;
         }
+        oledFbFlush();
+        _delay_ms(500);
     }
-    printf("X is:         %i - %i\n", cd->joyMinX, cd->joyMaxX);
-    printf("Y is:         %i - %i\n", cd->joyMinY, cd->joyMaxY);
-    printf("Center is:    %i,  %i\n", cd->centerX, cd->centerY);
+    oledFbClear();
+    oledTextCursor(0, 0);
+    oled_printf("X is:      %i - %i\n", cd->joyMinX, cd->joyMaxX);
+    oled_printf("Y is:      %i - %i\n", cd->joyMinY, cd->joyMaxY);
+    oled_printf("Center is: %i,  %i\n", cd->centerX, cd->centerY);
+    oledFbFlush();
+    _delay_ms(5000);
 }
 
 int lowpass(uint16_t value, uint16_t prevValue, float alpha)

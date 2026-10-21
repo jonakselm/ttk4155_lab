@@ -18,6 +18,10 @@ void oledReset(void);
 
 void oledInit(void);
 
+void oledGotoLine(uint8_t line);
+
+void oledGotoColumn(uint8_t col);
+
 void oledSetFullWindow(void);
 
 void oledFill(uint8_t pattern);

@@ -63,6 +63,20 @@ void oledInit(void)
     _delay_ms(100);                 // SEG/COM on after ~100 ms
 }
 
+void oledGotoLine(uint8_t line)
+{
+    oledWriteCmd(0x22);
+    oledWriteCmd(line & OLED_PAGES);
+    oledWriteCmd((line + 1) & OLED_PAGES);
+}
+
+void oledGotoColumn(uint8_t col)
+{
+    oledWriteCmd(0x21);
+    oledWriteCmd(col & OLED_WIDTH);
+    oledWriteCmd((col + 1) & OLED_WIDTH);
+}
+
 // Set write window to the whole screen (columns 0-127, pages 0-7)
 void oledSetFullWindow(void)
 {

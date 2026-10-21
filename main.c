@@ -10,14 +10,23 @@
 #include "gamepad.h"
 #include "spi.h"
 #include "oled.h"
+#include "framebuffer.h"
+#include "oled_text.h"
+#include "screensaver.h"
+#include "menu.h"
 
 #define EVER ;;
+#define CAN_CS_DDR DDRD
+#define CAN_CS 4
 
-enum ADC { ADC_A0, ADC_A1, ADC_A2, ADC_PD,
-    ADC_INH, ADC_BIP, ADC_DIFF, ADC_ALL };
 
 int main()
 {
+    //////////////////////////
+    // Add an array of callbacks
+    //  where a state variable can
+    //  decide the index of the callback
+    //  to use in the loop
     PORTB = 1;
     uart_init(UBRR);
     uart_link_printf();
@@ -27,6 +36,7 @@ int main()
     oledInit();
     oledSetFullWindow();
     oledWriteCmd(0xAF);
+    // oledReset();
     // Enable external SRAM/XMEM
     MCUCR |= 1 << SRE;
     // Disable high-order bits in use by JTAG
@@ -43,23 +53,53 @@ int main()
     // End Timer setup
     //////////CH1
 
-    // Gamepad gp;
-    // volatile char *adc_mmio = (char *) 0x1000; 
-    // CalibrationData cd;
+    Gamepad gp;
+    volatile char *adc_mmio = (char *) 0x1000; 
+    CalibrationData cd;
     // calibrate(adc_mmio, &cd);
+    
+    // screensaverInit();
+    oledFbClear();
+    oledFbFlush();
     int c = 0;
+
+    MenuState state;
+    MenuItem settingsItems[] = {
+        {"Screensaver", screensaverInit, NULL },
+        {"Noge", NULL, NULL },
+        {"Aent", NULL, NULL },
+        {"Tull", NULL, NULL },
+        {"Jada", NULL, NULL },
+        {"Neivel", NULL, NULL },
+        {"Calibrate", NULL, NULL },
+        {"Button Mapping", NULL, NULL }};
+    Menu settingsMenu = { "Settings", settingsItems, sizeof(settingsItems) / sizeof(settingsItems[0]), NULL };
+    menuInit(&state, &settingsMenu);
+    menuDraw(&state);
+    const int menuDelay = 200;
 
     for (EVER)
     {
-
-        c++;
-        _delay_ms(200);
-        // ssd1309_WriteCommand(0xA5);
-        // _delay_ms(20);
-        // ssd1309_WriteCommand(0x55);
-        // ssd1309_WriteData(0xAA);
-        // _delay_ms(20);
+        screensaverStep();
+        readGamepad(adc_mmio, &gp);
+        if (gp.joyY > 200)
+        {
+            menuUp(&state);
+            menuDraw(&state);
+            _delay_ms(menuDelay);
+        }
+        else if (gp.joyY < 75)
+        {
+            menuDown(&state);
+            menuDraw(&state);
+            _delay_ms(menuDelay);
+        }
         // readCalibrated(adc_mmio, &cd, &gp);
+        // oledFbClear();
+        // oledTextCursor(0, 0);
+        // oled_printf("Joystick: (%3i, %3i)\n", gp.joyX, gp.joyY);
+        // oled_printf("Touch: (%3i, %3i)\n", gp.touchX, gp.touchY);
+        // oledFbFlush();
         // printf("ADC:    %3i, %3i, %3i, %3i\r",
         //         gp.joyX, gp.joyY, gp.touchX, gp.touchY);
         // printf("ADC:    %3i%%, %3i%%, %3i%%, %3i%%\r", valueToPercentage(gp.joyX),
