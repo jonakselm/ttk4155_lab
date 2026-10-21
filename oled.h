@@ -1,9 +1,6 @@
 #ifndef OLED_H
 #define OLED_H
 
-#define SDD_DC 2
-#define SSD_CS 3
-#define SSD_RES 3
 
 #define OLED_WIDTH 128
 #define OLED_PAGES 8

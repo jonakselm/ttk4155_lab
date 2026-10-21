@@ -8,8 +8,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "oled_text.h"
-
-#define BUSY PB1
+#include "io_defines.h"
 
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
@@ -123,7 +122,7 @@ int lowpass(uint16_t value, uint16_t prevValue, float alpha)
 void readGamepad(volatile char *address, Gamepad *gp)
 {
     address[0] = 0;
-    while (!(PINB & (1 << BUSY)));
+    while (!(PINB & (1 << PB_BUSY)));
 
     float alpha = 0.8;
 

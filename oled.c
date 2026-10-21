@@ -3,37 +3,38 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include "spi.h"
+#include "io_defines.h"
 
 void oledWriteCmd(uint8_t cmd)
 {
-    PORTB &= ~((1 << SDD_DC) | (1 << SSD_CS));
+    PORTB &= ~((1 << PB_SDD_DC) | (1 << PB_SSD_CS));
     SPI_MasterTransmit(cmd);
-    PORTB |= (1 << SSD_CS);
+    PORTB |= (1 << PB_SSD_CS);
 }
 
 void oledWriteData(uint8_t data)
 {
-    PORTB &= ~(1 << SSD_CS);
-    PORTB |= (1 << SDD_DC);
+    PORTB &= ~(1 << PB_SSD_CS);
+    PORTB |= (1 << PB_SDD_DC);
     SPI_MasterTransmit(data);
-    PORTB |= (1 << SSD_CS);
+    PORTB |= (1 << PB_SSD_CS);
 }
 
 void oledReset(void)
 {
-    PORTD |= (1 << SSD_RES);
+    PORTD |= (1 << PD_SSD_RES);
     _delay_ms(1);
-    PORTD &= ~(1 << SSD_RES);
+    PORTD &= ~(1 << PD_SSD_RES);
     _delay_us(10);
-    PORTD |= (1 << SSD_RES);
+    PORTD |= (1 << PD_SSD_RES);
     _delay_ms(1);
 }
 
 void oledInit(void)
 {
-    DDRB |= (1 << SSD_CS) | (1 << SDD_DC);
+    DDRB |= (1 << PB_SSD_CS) | (1 << PB_SDD_DC);
     // Reset pin as output
-    DDRD |= (1 << SSD_RES);
+    DDRD |= (1 << PD_SSD_RES);
 
     oledReset();
 

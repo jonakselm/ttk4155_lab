@@ -14,10 +14,9 @@
 #include "oled_text.h"
 #include "screensaver.h"
 #include "menu.h"
+#include "io_defines.h"
 
 #define EVER ;;
-#define CAN_CS_DDR DDRD
-#define CAN_CS 4
 
 
 int main()
