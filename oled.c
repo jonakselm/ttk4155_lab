@@ -7,34 +7,35 @@
 
 void oledWriteCmd(uint8_t cmd)
 {
-    PORTB &= ~((1 << PB_SDD_DC) | (1 << PB_SSD_CS));
-    SPI_MasterTransmit(cmd);
-    PORTB |= (1 << PB_SSD_CS);
+    PORT_DISPLAY_DC &= ~(1 << BIT_DISPLAY_DC);
+    SPI_Transmit(cmd);
 }
 
 void oledWriteData(uint8_t data)
 {
-    PORTB &= ~(1 << PB_SSD_CS);
-    PORTB |= (1 << PB_SDD_DC);
-    SPI_MasterTransmit(data);
-    PORTB |= (1 << PB_SSD_CS);
+    PORT_DISPLAY_DC |= (1 << BIT_DISPLAY_DC);
+    SPI_Transmit(data);
 }
 
 void oledReset(void)
 {
-    PORTD |= (1 << PD_SSD_RES);
+    PORT_DISPLAY_RESET |= (1 << BIT_DISPLAY_RESET);
     _delay_ms(1);
-    PORTD &= ~(1 << PD_SSD_RES);
+    PORT_DISPLAY_RESET &= ~(1 << BIT_DISPLAY_RESET);
     _delay_us(10);
-    PORTD |= (1 << PD_SSD_RES);
+    PORT_DISPLAY_RESET |= (1 << BIT_DISPLAY_RESET);
     _delay_ms(1);
 }
 
 void oledInit(void)
 {
-    DDRB |= (1 << PB_SSD_CS) | (1 << PB_SDD_DC);
-    // Reset pin as output
-    DDRD |= (1 << PD_SSD_RES);
+    // Set D/C, DISP_SS and DISP_RESET to output
+    DDR_DISPLAY_DC |= 1 << BIT_DISPLAY_DC;
+    DDR_DISPLAY_SS |= 1 << BIT_DISPLAY_SS;
+    DDR_DISPLAY_RESET |= (1 << BIT_DISPLAY_RESET);
+
+    SPI_EnableSlave(BIT_DISPLAY_SS, PORT_DISPLAY_SS);
+
 
     oledReset();
 

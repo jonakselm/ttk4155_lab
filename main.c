@@ -26,12 +26,12 @@ int main()
     //  where a state variable can
     //  decide the index of the callback
     //  to use in the loop
-    PORTB = 1;
     uart_init(UBRR);
     uart_link_printf();
     printf("\n\nUART initialized\n");
     _delay_ms(1);
     SPI_MasterInit();
+    gamepadInit();
     oledInit();
     oledSetFullWindow();
     oledWriteCmd(0xAF);
@@ -56,7 +56,7 @@ int main()
     volatile char *adc_mmio = (char *) 0x1000; 
     CalibrationData cd;
     // calibrate(adc_mmio, &cd);
-    
+
     // screensaverInit();
     oledFbClear();
     oledFbFlush();
@@ -76,30 +76,45 @@ int main()
     menuInit(&state, &settingsMenu);
     menuDraw(&state);
     const int menuDelay = 200;
+    uint8_t buf[2];
+
+    int led = 0;
 
     for (EVER)
     {
-        screensaverStep();
-        readGamepad(adc_mmio, &gp);
-        if (gp.joyY > 200)
-        {
-            menuUp(&state);
-            menuDraw(&state);
-            _delay_ms(menuDelay);
-        }
-        else if (gp.joyY < 75)
-        {
-            menuDown(&state);
-            menuDraw(&state);
-            _delay_ms(menuDelay);
-        }
+        // screensaverStep();
+        // led = !led;
+        // readGamepadSPI(&gp);
+
+        oledFbClear();
+        oledTextSetColumn(0);
+        oledTextSetLine(0);
+        oled_printf("DISP_SS: %i\nIO_SS: %i\nNoge %i", (PIN_DISPLAY_SS & (1 << BIT_DISPLAY_SS)) >> BIT_DISPLAY_SS, (PIN_IO_SS & (1 << BIT_IO_SS)) >> BIT_IO_SS, c++);
+        oledFbFlush();
+        
+        // if (gp.joyY > 200)
+        // {
+        //     menuUp(&state);
+        //     // _delay_ms(menuDelay);
+        // }
+        // else if (gp.joyY < 50)
+        // {
+        //     menuDown(&state);
+        //     // _delay_ms(menuDelay);
+        // }
+        // menuDraw(&state);
+        
         // readCalibrated(adc_mmio, &cd, &gp);
         // oledFbClear();
         // oledTextCursor(0, 0);
+        // oledFbClear();
+        // oledTextSetColumn(0);
+        // oledTextSetLine(0);
         // oled_printf("Joystick: (%3i, %3i)\n", gp.joyX, gp.joyY);
+        // oledFbFlush();
         // oled_printf("Touch: (%3i, %3i)\n", gp.touchX, gp.touchY);
         // oledFbFlush();
-        // printf("ADC:    %3i, %3i, %3i, %3i\r",
+        // printf("Noge lange tekst:    %3i, %3i, %3i, %3i\r",
         //         gp.joyX, gp.joyY, gp.touchX, gp.touchY);
         // printf("ADC:    %3i%%, %3i%%, %3i%%, %3i%%\r", valueToPercentage(gp.joyX),
         //         valueToPercentage(gp.joyY), valueToPercentage(gp.touchX),

@@ -1,6 +1,6 @@
+#include "gamepad.h"
 #include "framebuffer.h"
 #define F_CPU 4915200
-#include "gamepad.h"
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
@@ -9,9 +9,16 @@
 #include <stdint.h>
 #include "oled_text.h"
 #include "io_defines.h"
+#include "spi.h"
 
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
+
+void gamepadInit()
+{
+    DDR_IO_SS |= 1 << BIT_IO_SS;
+    PORT_IO_SS |= 1 << BIT_IO_SS;
+}
 
 char valueToPercentage(uint8_t value)
 {
@@ -114,33 +121,8 @@ void calibrate(volatile char *address, CalibrationData *cd)
     _delay_ms(5000);
 }
 
-int lowpass(uint16_t value, uint16_t prevValue, float alpha)
+void calculateCalibrated(CalibrationData *cd, Gamepad *gp)
 {
-    return alpha * value + (1 - alpha) * prevValue;
-}
-
-void readGamepad(volatile char *address, Gamepad *gp)
-{
-    address[0] = 0;
-    while (!(PINB & (1 << PB_BUSY)));
-
-    float alpha = 0.8;
-
-    gp->joyX = address[0];
-    gp->joyY = address[0];
-    gp->touchX = address[0];
-    gp->touchY = address[0];
-
-    // gp->joyX = lowpass(address[0], gp->joyX, alpha);
-    // gp->joyY = lowpass(address[0], gp->joyY, alpha);
-    // gp->touchX = lowpass(address[0], gp->touchX, alpha);
-    // gp->touchY = lowpass(address[0], gp->touchY, alpha);
-}
-
-void readCalibrated(volatile char *address, CalibrationData *cd, Gamepad *gp)
-{
-    readGamepad(address, gp);
-
     int halfpoint = 127;
 
     int negRangeX = cd->centerX - cd->joyMinX;
@@ -183,4 +165,61 @@ void readCalibrated(volatile char *address, CalibrationData *cd, Gamepad *gp)
     {
         gp->joyY = max((int16_t)128 + tmp * halfpoint / negRangeY, 0);
     }
+}
+
+void readGamepad(volatile char *address, Gamepad *gp)
+{
+    address[0] = 0;
+    while (!(PIN_BUSY & (1 << BIT_BUSY)));
+
+    float alpha = 0.8;
+
+    gp->joyX = address[0];
+    gp->joyY = address[0];
+    gp->touchX = address[0];
+    gp->touchY = address[0];
+
+    // gp->joyX = lowpass(address[0], gp->joyX, alpha);
+    // gp->joyY = lowpass(address[0], gp->joyY, alpha);
+    // gp->touchX = lowpass(address[0], gp->touchX, alpha);
+    // gp->touchY = lowpass(address[0], gp->touchY, alpha);
+}
+
+void readGamepadSPI(Gamepad *gp)
+{
+    uint8_t buf[3];
+
+    // Read joystick
+    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x03, buf, 3); 
+    gp->joyX = buf[0];
+    gp->joyY = buf[1];
+
+    // Read touchpad
+    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x01, buf, 3);
+    gp->touchX = buf[0];
+    gp->touchY = buf[1];
+
+    // Buttons
+    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x04, buf, 3);
+    gp->buttons.right = buf[0];
+    gp->buttons.left = buf[1];
+    gp->buttons.nav = buf[2];
+
+
+    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x02, buf, 2);
+    gp->slider = buf[0];
+
+    _delay_us(2);
+}
+
+void readCalibrated(volatile char *address, CalibrationData *cd, Gamepad *gp)
+{
+    readGamepad(address, gp);
+    calculateCalibrated(cd, gp);
+}
+
+void readCalibratedSPI(CalibrationData *cd, Gamepad *gp)
+{
+    readGamepadSPI(gp);
+    calculateCalibrated(cd, gp);
 }

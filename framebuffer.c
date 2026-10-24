@@ -1,5 +1,7 @@
 #include "framebuffer.h"
 #include "oled.h"        /* oledWriteCmd(), oledWriteData() */
+#include "io_defines.h"
+#include "spi.h"
 
 /* The framebuffer lives in external SRAM. XMEM must be enabled
  * (MCUCR |= 1 << SRE) before any of these functions are called. */
@@ -7,6 +9,7 @@ static uint8_t *const fb = (uint8_t *)OLED_FB_ADDR;
 
 void oledFbClear(void)
 {
+    SPI_EnableSlave(BIT_DISPLAY_SS, PORT_DISPLAY_SS);
     for (uint16_t i = 0; i < OLED_FB_SIZE; i++)
         fb[i] = 0x00;
 }
@@ -63,4 +66,6 @@ void oledFbFlush(void)
 
     for (uint16_t i = 0; i < OLED_FB_SIZE; i++)
         oledWriteData(fb[i]);
+
+    SPI_DisableSlave(BIT_DISPLAY_SS, PORT_DISPLAY_SS);
 }

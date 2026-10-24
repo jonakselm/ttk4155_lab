@@ -28,5 +28,20 @@
     "directory": "/home/student/Documents/noge",
     "file": "/home/student/Documents/noge/oled.c",
     "command": "/usr/bin/avr-gcc main.c -I /usr/lib/avr/include -std=c11 -D __AVR_ATmega162__"
+},
+{
+    "directory": "/home/student/Documents/noge",
+    "file": "/home/student/Documents/noge/menu.c",
+    "command": "/usr/bin/avr-gcc main.c -I /usr/lib/avr/include -std=c11 -D __AVR_ATmega162__"
+},
+{
+    "directory": "/home/student/Documents/noge",
+    "file": "/home/student/Documents/noge/framebuffer.c",
+    "command": "/usr/bin/avr-gcc main.c -I /usr/lib/avr/include -std=c11 -D __AVR_ATmega162__"
+},
+{
+    "directory": "/home/student/Documents/noge",
+    "file": "/home/student/Documents/noge/oled_text.c",
+    "command": "/usr/bin/avr-gcc main.c -I /usr/lib/avr/include -std=c11 -D __AVR_ATmega162__"
 }
 ]
