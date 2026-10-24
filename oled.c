@@ -34,7 +34,7 @@ void oledInit(void)
     DDR_DISPLAY_SS |= 1 << BIT_DISPLAY_SS;
     DDR_DISPLAY_RESET |= (1 << BIT_DISPLAY_RESET);
 
-    SPI_EnableSlave(BIT_DISPLAY_SS, PORT_DISPLAY_SS);
+    SPI_EnableSlave(BIT_DISPLAY_SS, &PORT_DISPLAY_SS);
 
 
     oledReset();

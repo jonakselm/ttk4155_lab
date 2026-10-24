@@ -9,7 +9,7 @@ static uint8_t *const fb = (uint8_t *)OLED_FB_ADDR;
 
 void oledFbClear(void)
 {
-    SPI_EnableSlave(BIT_DISPLAY_SS, PORT_DISPLAY_SS);
+    SPI_EnableSlave(BIT_DISPLAY_SS, &PORT_DISPLAY_SS);
     for (uint16_t i = 0; i < OLED_FB_SIZE; i++)
         fb[i] = 0x00;
 }
@@ -67,5 +67,5 @@ void oledFbFlush(void)
     for (uint16_t i = 0; i < OLED_FB_SIZE; i++)
         oledWriteData(fb[i]);
 
-    SPI_DisableSlave(BIT_DISPLAY_SS, PORT_DISPLAY_SS);
+    SPI_DisableSlave(BIT_DISPLAY_SS, &PORT_DISPLAY_SS);
 }

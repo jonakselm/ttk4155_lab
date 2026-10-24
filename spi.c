@@ -15,14 +15,14 @@ void SPI_MasterInit(void)
     SPCR = (1 << SPE) | (0 << DORD) | (1 << MSTR) | (0 << CPOL) | (0 << SPR0);
 }
 
-void SPI_EnableSlave(int slave_bit, int slave_port)
+void SPI_EnableSlave(uint8_t slave_bit, PORT_TYPE *slave_port)
 {
-    slave_port &= ~(1 << slave_bit);
+    *slave_port &= ~(1 << slave_bit);
 }
 
-void SPI_DisableSlave(int slave_bit, int slave_port)
+void SPI_DisableSlave(uint8_t slave_bit, PORT_TYPE *slave_port)
 {
-    slave_port |= (1 << slave_bit);
+    *slave_port |= (1 << slave_bit);
 }
 
 uint8_t SPI_Transmit(char cData)
@@ -38,9 +38,10 @@ uint8_t SPI_Transmit(char cData)
     return SPDR;
 }
 
-void SPI_Read(uint8_t slave_bit, uint8_t slave_port, uint8_t cmd, uint8_t *buffer, int size)
+void SPI_Read(uint8_t slave_bit, PORT_TYPE *slave_port, uint8_t cmd, uint8_t *buffer, int size)
 {
     SPI_EnableSlave(slave_bit, slave_port);
+    // printf("DISP_SS: %i\nIO_SS: %i\n", (PIN_DISPLAY_SS & (1 << BIT_DISPLAY_SS)) >> BIT_DISPLAY_SS, (PIN_IO_SS & (1 << BIT_IO_SS)) >> BIT_IO_SS);
     SPI_Transmit(cmd);
     _delay_us(40);
     for (int i = 0; i < size; i++)

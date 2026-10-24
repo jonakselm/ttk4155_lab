@@ -79,39 +79,46 @@ int main()
     uint8_t buf[2];
 
     int led = 0;
+    DDR_CAN_SS |= 1;
 
     for (EVER)
     {
         // screensaverStep();
-        // led = !led;
-        // readGamepadSPI(&gp);
+        readGamepadSPI(&gp);
 
-        oledFbClear();
-        oledTextSetColumn(0);
-        oledTextSetLine(0);
-        oled_printf("DISP_SS: %i\nIO_SS: %i\nNoge %i", (PIN_DISPLAY_SS & (1 << BIT_DISPLAY_SS)) >> BIT_DISPLAY_SS, (PIN_IO_SS & (1 << BIT_IO_SS)) >> BIT_IO_SS, c++);
-        oledFbFlush();
-        
-        // if (gp.joyY > 200)
-        // {
-        //     menuUp(&state);
-        //     // _delay_ms(menuDelay);
-        // }
-        // else if (gp.joyY < 50)
-        // {
-        //     menuDown(&state);
-        //     // _delay_ms(menuDelay);
-        // }
-        // menuDraw(&state);
+        // oledFbClear();
+        // oledTextSetColumn(0);
+        // oledTextSetLine(0);
+        // printf("DISP_SS: %i\nIO_SS: %i\nNoge %i\n", (PIN_DISPLAY_SS & (1 << BIT_DISPLAY_SS)) >> BIT_DISPLAY_SS, (PIN_IO_SS & (1 << BIT_IO_SS)) >> BIT_IO_SS, c++);
+        // oledFbFlush();
+        // led = !led;
+        // PORT_CAN_SS |= 1;
+        //
+        if (gp.joyY > 190)
+        {
+            menuUp(&state);
+            // _delay_ms(menuDelay);
+        }
+        else if (gp.joyY < 60)
+        {
+            menuDown(&state);
+            // _delay_ms(menuDelay);
+        }
+        menuDraw(&state);
+        //
+        // PORT_CAN_SS &= ~1;
         
         // readCalibrated(adc_mmio, &cd, &gp);
         // oledFbClear();
         // oledTextCursor(0, 0);
+        
         // oledFbClear();
         // oledTextSetColumn(0);
         // oledTextSetLine(0);
         // oled_printf("Joystick: (%3i, %3i)\n", gp.joyX, gp.joyY);
         // oledFbFlush();
+        // oled_printf("DISP_SS: %i\nIO_SS: %i\nNoge %i\n", (PIN_DISPLAY_SS & (1 << BIT_DISPLAY_SS)) >> BIT_DISPLAY_SS, (PIN_IO_SS & (1 << BIT_IO_SS)) >> BIT_IO_SS, c++);
+        
         // oled_printf("Touch: (%3i, %3i)\n", gp.touchX, gp.touchY);
         // oledFbFlush();
         // printf("Noge lange tekst:    %3i, %3i, %3i, %3i\r",

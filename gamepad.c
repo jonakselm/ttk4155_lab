@@ -190,23 +190,23 @@ void readGamepadSPI(Gamepad *gp)
     uint8_t buf[3];
 
     // Read joystick
-    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x03, buf, 3); 
+    SPI_Read(BIT_IO_SS, &PORT_IO_SS, 0x03, buf, 3); 
     gp->joyX = buf[0];
     gp->joyY = buf[1];
 
     // Read touchpad
-    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x01, buf, 3);
+    SPI_Read(BIT_IO_SS, &PORT_IO_SS, 0x01, buf, 3);
     gp->touchX = buf[0];
     gp->touchY = buf[1];
 
     // Buttons
-    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x04, buf, 3);
+    SPI_Read(BIT_IO_SS, &PORT_IO_SS, 0x04, buf, 3);
     gp->buttons.right = buf[0];
     gp->buttons.left = buf[1];
     gp->buttons.nav = buf[2];
 
-
-    SPI_Read(BIT_IO_SS, PORT_IO_SS, 0x02, buf, 2);
+    // Slider
+    SPI_Read(BIT_IO_SS, &PORT_IO_SS, 0x02, buf, 2);
     gp->slider = buf[0];
 
     _delay_us(2);
