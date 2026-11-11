@@ -1,0 +1,37 @@
+[
+    {
+        "directory": "/home/student/Documents/node2",
+        "file": "/home/student/Documents/node2/main.c",
+        "command": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c11 -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I . -D __SAM3X8E__ -c main.c"
+    },
+    {
+        "directory": "/home/student/Documents/node2",
+        "file": "/home/student/Documents/node2/can.c",
+        "command": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c11 -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I . -D __SAM3X8E__ -c can.c"
+    },
+    {
+        "directory": "/home/student/Documents/node2",
+        "file": "/home/student/Documents/node2/time.c",
+        "command": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c11 -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I . -D __SAM3X8E__ -c time.c"
+    },
+    {
+        "directory": "/home/student/Documents/node2",
+        "file": "/home/student/Documents/node2/uart.c",
+        "command": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c11 -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I . -D __SAM3X8E__ -c uart.c"
+    },
+    {
+        "directory": "/home/student/Documents/node2",
+        "file": "/home/student/Documents/node2/sam/sam3x/source/exceptions.c",
+        "command": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c11 -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I . -D __SAM3X8E__ -c sam/sam3x/source/exceptions.c"
+    },
+    {
+        "directory": "/home/student/Documents/node2",
+        "file": "/home/student/Documents/node2/sam/sam3x/source/startup_sam3x.c",
+        "command": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c11 -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I . -D __SAM3X8E__ -c sam/sam3x/source/startup_sam3x.c"
+    },
+    {
+        "directory": "/home/student/Documents/node2",
+        "file": "/home/student/Documents/node2/sam/sam3x/source/system_sam3x.c",
+        "command": "/usr/bin/arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -std=c11 -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I . -D __SAM3X8E__ -c sam/sam3x/source/system_sam3x.c"
+    }
+]
