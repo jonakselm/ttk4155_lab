@@ -46,24 +46,6 @@
       "..",
       "-c",
       "-o",
-      "build/sram_test.o",
-      "sram_test.c"
-    ],
-    "directory": "/home/student/Documents/noge/node1",
-    "file": "/home/student/Documents/noge/node1/sram_test.c",
-    "output": "/home/student/Documents/noge/node1/build/sram_test.o"
-  },
-  {
-    "arguments": [
-      "/usr/bin/avr-gcc",
-      "-O",
-      "-std=c11",
-      "-mmcu=atmega162",
-      "-ggdb",
-      "-I",
-      "..",
-      "-c",
-      "-o",
       "build/gamepad.o",
       "gamepad.c"
     ],
@@ -226,11 +208,47 @@
       "..",
       "-c",
       "-o",
-      "build/test_loopback.o",
-      "test_loopback.c"
+      "build/state.o",
+      "state.c"
     ],
     "directory": "/home/student/Documents/noge/node1",
-    "file": "/home/student/Documents/noge/node1/test_loopback.c",
-    "output": "/home/student/Documents/noge/node1/build/test_loopback.o"
+    "file": "/home/student/Documents/noge/node1/state.c",
+    "output": "/home/student/Documents/noge/node1/build/state.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/avr-gcc",
+      "-O",
+      "-std=c11",
+      "-mmcu=atmega162",
+      "-ggdb",
+      "-I",
+      "..",
+      "-c",
+      "-o",
+      "build/input.o",
+      "input.c"
+    ],
+    "directory": "/home/student/Documents/noge/node1",
+    "file": "/home/student/Documents/noge/node1/input.c",
+    "output": "/home/student/Documents/noge/node1/build/input.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/avr-gcc",
+      "-O",
+      "-std=c11",
+      "-mmcu=atmega162",
+      "-ggdb",
+      "-I",
+      "..",
+      "-c",
+      "-o",
+      "build/menu_state.o",
+      "menu_state.c"
+    ],
+    "directory": "/home/student/Documents/noge/node1",
+    "file": "/home/student/Documents/noge/node1/menu_state.c",
+    "output": "/home/student/Documents/noge/node1/build/menu_state.o"
   }
 ]

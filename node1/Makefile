@@ -1,7 +1,7 @@
 # List all source files to be compiled; separate with space
-SOURCE_FILES := main.c uart.c sram_test.c gamepad.c \
+SOURCE_FILES := main.c uart.c gamepad.c \
 	spi.c oled.c framebuffer.c oled_text.c screensaver.c \
-	menu.c can.c mcp2515.c test_loopback.c
+	menu.c can.c mcp2515.c state.c
 # SOURCE_FILES := test.c
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used

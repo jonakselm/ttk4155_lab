@@ -26,98 +26,110 @@ char valueToPercentage(uint8_t value)
     return ((char)(value * 0.3922) - 50) << 1;
 }
 
-int hasMoved(Gamepad *gp, Gamepad *prevGp, int index)
+/* Is the stick where calibration step 'index' wants it?
+ * 0 = left, 1 = right, 2 = down, 3 = up, 4 = centre */
+int hasMoved(Gamepad *gp, int index)
 {
-    int movedThreshold = 100;
-    // printf("GP:         %3i, %3i, %3i, %3i\n",
-    //         gp->joyX, gp->joyY, gp->touchX, gp->touchY);
-    // printf("Prev GP:    %3i, %3i, %3i, %3i\n\n",
-    //         prevGp->joyX, prevGp->joyY, prevGp->touchX, prevGp->touchY);
-
     switch (index)
     {
-    case 0:
-    case 1:
-        oledFbClear();
-        oled_printf("%i\r", abs((char)gp->joyX - (char)prevGp->joyX));
-        oledFbFlush();
-        return abs((char)gp->joyX - (char)prevGp->joyX) > movedThreshold;
-        break;
-    case 2:
-    case 3:
-        oled_printf("%i\r", abs((char)gp->joyY - (char)prevGp->joyY));
-        return abs((char)gp->joyY - (char)prevGp->joyY) > movedThreshold;
-        break;
-    case 4:
-        // return  abs((char)gp->joyX - (char)prevGp->joyX) > movedThreshold >> 2 &&
-        //     abs((char)gp->joyY - (char)prevGp->joyY) > movedThreshold >> 2;
-        return 1;
-        break;
+    case 0: return gp->joyX < 60;
+    case 1: return gp->joyX > 190;
+    case 2: return gp->joyY < 60;
+    case 3: return gp->joyY > 190;
+    case 4: return gp->joyX > 100 && gp->joyX < 155 &&
+                   gp->joyY > 100 && gp->joyY < 155;
     }
     return 0;
 }
 
-void calibrate(volatile char *address, CalibrationData *cd)
+void calibrateSPI(CalibrationData *cd)
 {
-    Gamepad prevGp;
+    static const char *const prompt[5] = {
+        "Push LEFT!\n", "Push RIGHT!\n", "Push DOWN!\n", "Push UP!\n", "Let go!\n"
+    };
     Gamepad gp;
-    readGamepad(address, &gp);
+
+    cd->valid = 0;
     for (int i = 0; i < 5; i++)
     {
         oledFbClear();
         oledTextCursor(0, 0);
-        oled_printf("Move!\n");
+        oled_printf("%s", prompt[i]);
         oledFbFlush();
+
+        /* Wait until the stick is where this step wants it */
         do
         {
-            prevGp = gp;
-            readGamepad(address, &gp);
-        } while (!hasMoved(&gp, &prevGp, i));
+            readGamepadSPI(&gp);
+        } while (!hasMoved(&gp, i));
         _delay_ms(200);
 
         oledFbClear();
         oledTextCursor(0, 0);
         oled_printf("Hold it!\n");
         oledFbFlush();
-        for (unsigned int j = 0; j < 50000u; j++)
+
+        /* Average the readings taken while the stick is still in
+         * position: noise spikes barely matter, and readings after
+         * letting go are skipped. SPI reads are slow, so 2000 is short. */
+        uint32_t sumX = 0, sumY = 0;
+        uint16_t count = 0;
+        for (unsigned int j = 0; j < 2000u; j++)
         {
-            readGamepad(address, &gp);
+            readGamepadSPI(&gp);
+            if (hasMoved(&gp, i))
+            {
+                sumX += gp.joyX;
+                sumY += gp.joyY;
+                count++;
+            }
         }
-        
+        if (count == 0)
+            count = 1;              /* let go at once: values become 0, so valid fails */
+        uint8_t avgX = sumX / count;
+        uint8_t avgY = sumY / count;
+
         oledFbClear();
         oledTextCursor(0, 0);
         switch (i)
         {
         case 0:
-            cd->joyMinX = gp.joyX;
+            cd->joyMinX = avgX;
             oled_printf("X min is: %3i\n", cd->joyMinX);
             break;
         case 1:
-            cd->joyMaxX = gp.joyX;
+            cd->joyMaxX = avgX;
             oled_printf("X max is: %3i\n", cd->joyMaxX);
             break;
         case 2:
-            cd->joyMinY = gp.joyY;
+            cd->joyMinY = avgY;
             oled_printf("Y min is: %3i\n", cd->joyMinY);
             break;
         case 3:
-            cd->joyMaxY = gp.joyY;
+            cd->joyMaxY = avgY;
             oled_printf("Y max is: %3i\n", cd->joyMaxY);
             break;
         case 4:
-            cd->centerX = gp.joyX;
-            cd->centerY = gp.joyY;
+            cd->centerX = avgX;
+            cd->centerY = avgY;
             oled_printf("Center is: %3i, %3i\n\n", cd->centerX, cd->centerY);
             break;
         }
         oledFbFlush();
         _delay_ms(500);
     }
+
+    /* Only use it if min < centre < max on both axes,
+     * otherwise calculateCalibrated() could divide by zero */
+    cd->valid = cd->joyMinX < cd->centerX && cd->centerX < cd->joyMaxX &&
+                cd->joyMinY < cd->centerY && cd->centerY < cd->joyMaxY;
+
     oledFbClear();
     oledTextCursor(0, 0);
     oled_printf("X is:      %i - %i\n", cd->joyMinX, cd->joyMaxX);
     oled_printf("Y is:      %i - %i\n", cd->joyMinY, cd->joyMaxY);
     oled_printf("Center is: %i,  %i\n", cd->centerX, cd->centerY);
+    oled_printf(cd->valid ? "OK\n" : "FAILED, try again\n");
     oledFbFlush();
     _delay_ms(5000);
 }

@@ -14,13 +14,14 @@ typedef struct
     // uint8_t touchMinX, touchMaxX;
     // uint8_t touchMinY, touchMaxY;
     uint8_t centerX, centerY;
+    uint8_t valid;              /* 1 once calibrated */
 } CalibrationData;
 
 void gamepadInit();
 
 char valueToPercentage(uint8_t value);
 
-void calibrate(volatile char *address, CalibrationData *cd);
+void calibrateSPI(CalibrationData *cd);   /* reads the IO board over SPI */
 void calculateCalibrated(CalibrationData *cd, Gamepad *gp);
 
 void readGamepad(volatile char *address, Gamepad *gp);

@@ -1,3 +1,6 @@
+#ifndef COMMON_H
+#define COMMON_H
+
 #include <stdint.h>
 
 typedef struct __attribute__((packed))
@@ -57,3 +60,5 @@ typedef struct
         };
     };
 } Gamepad;
+
+#endif // COMMON_H

@@ -2,31 +2,31 @@
 #define MENU_H
 
 #include <stdint.h>
-#include <stddef.h>     /* NULL */
+#include <stddef.h>
 
 typedef struct Menu Menu;
 
 typedef struct {
-    const char *label;          /* text shown in the menu */
-    void (*action)(void);       /* called on select (NULL = none) */
-    Menu *submenu;              /* opened on select (NULL = none) */
+    const char *label;
+    void (*action)(void);
+    Menu *submenu;
 } MenuItem;
 
 struct Menu {
-    const char     *title;
+    const char *title;
     const MenuItem *items;
-    uint8_t         count;
-    Menu           *parent;     /* where "back" goes (NULL = top level) */
+    uint8_t count;
+    Menu *parent;
 };
 
 typedef struct {
-    Menu   *current;            /* menu being shown */
-    uint8_t selected;           /* index of highlighted item */
-    uint8_t scroll;             /* index of first visible item */
+    Menu *current;
+    uint8_t selected;
+    uint8_t scroll;
 } MenuState;
 
 void menuInit(MenuState *s, Menu *root);
-void menuDraw(MenuState *s);      /* draws into framebuffer and flushes */
+void menuDraw(MenuState *s);
 
 void menuUp(MenuState *s);
 void menuDown(MenuState *s);
