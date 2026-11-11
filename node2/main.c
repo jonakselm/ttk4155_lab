@@ -6,6 +6,7 @@
 #include "can.h"
 #include <string.h>
 #include "gamepad.h"
+#include "encoder.h"
 #include "io.h"
 #include <time.h>
 
@@ -57,7 +58,7 @@ int main()
 
     // Set D6/PC24 output
     PIOC->PIO_PER = PIO_PER_P24;
-    PIOC->PIO_OER = PIO_PER_P24;
+    PIOC->PIO_OER = PIO_OER_P24;
 
 
     CanInit canInit;
@@ -68,6 +69,9 @@ int main()
     canInit.sjw = 0;
     canInit.smp = 0;
     can_init(canInit, 0);
+
+    initEncoder();
+    uint64_t nextEncoderPrint = 0;
 
     unsigned int c = 0;
 
@@ -92,5 +96,12 @@ int main()
                 PIOC->PIO_SODR = PIO_SODR_P24;
         }
         c = 0;
+
+        // Encoder test: print the position 5 times a second
+        if (time_now() >= nextEncoderPrint)
+        {
+            nextEncoderPrint = time_now() + msecs(200);
+            printf("Encoder: %ld\r\n", (long)readEncoder());
+        }
     }
 }
