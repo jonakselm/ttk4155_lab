@@ -14,7 +14,7 @@ typedef struct
     // uint8_t touchMinX, touchMaxX;
     // uint8_t touchMinY, touchMaxY;
     uint8_t centerX, centerY;
-    uint8_t valid;              /* 1 once calibrated */
+    uint8_t valid;
 } CalibrationData;
 
 void gamepadInit();

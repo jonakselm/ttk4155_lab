@@ -240,7 +240,7 @@ void readCalibratedSPI(CalibrationData *cd, Gamepad *gp)
 CanMessage canEncodeGamepadData(Gamepad *gp)
 {
     CanMessage msg;
-    msg.id = 42;
+    msg.id = CAN_ID_GAMEPAD;
     msg.dword[0] = gp->dword[0];
     msg.dword[1] = gp->dword[1];
     msg.length = 8;

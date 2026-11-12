@@ -3,6 +3,13 @@
 
 #include <stdint.h>
 
+// CAN message IDs shared by both nodes
+#define CAN_ID_GOAL     2
+#define CAN_ID_START    3
+#define CAN_ID_GAMEPAD 42
+
+#define JOY_DEADZONE   20
+
 typedef struct __attribute__((packed))
 {
     union

@@ -14,6 +14,8 @@ static CalibrationData cd;      /* cd.valid = 0 until calibrated */
 
 static uint8_t lastSelect, lastBack, lastUp, lastDown;
 
+static uint8_t gameOver;        /* 1 after node 2 reports a goal */
+
 void stateUpdate(MenuState *menu, Gamepad *gp)
 {
     /* "Pressed" = held now but not last loop, so one press = one action */
@@ -36,12 +38,25 @@ void stateUpdate(MenuState *menu, Gamepad *gp)
     {
     case SCREEN_PING_PONG:
         {
-            CanMessage msg = canEncodeGamepadData(gp);
-            can_send(&msg);
+            // Node 2 says the ball broke the IR beam
+            CanMessage rx;
+            if (can_receive(&rx) && rx.id == CAN_ID_GOAL)
+                gameOver = 1;
 
             oledFbClear();
-            oledTextCursor(OLED_WIDTH / 2 - 14, OLED_HEIGHT / 2 - 4);
-            oled_printf("Game!");
+            if (gameOver)
+            {
+                oledTextCursor((OLED_WIDTH - 9 * 6) / 2, OLED_HEIGHT / 2 - 4);   // 9 chars, 6 px each
+                oled_printf("GAME OVER");
+            }
+            else
+            {
+                oledTextCursor(OLED_WIDTH / 2 - 14, OLED_HEIGHT / 2 - 4);
+                oled_printf("Game!");
+
+                CanMessage msg = canEncodeGamepadData(gp);
+                can_send(&msg);
+            }
             oledFbFlush();
         }
         break;
@@ -68,6 +83,16 @@ void stateUpdate(MenuState *menu, Gamepad *gp)
             }
             else if (menu->selected == MENU_INDEX_PING_PONG)
             {
+                // New game: throw away old messages, so an old goal can't end it at once
+                CanMessage old;
+                while (can_receive(&old))
+                    ;
+                gameOver = 0;
+
+                // Tell node 2 a new game starts: it turns the actuators on
+                CanMessage start = { .id = CAN_ID_START, .length = 0 };
+                can_send(&start);
+
                 screen = SCREEN_PING_PONG;
             }
         }
@@ -99,7 +124,14 @@ void stateUpdate(MenuState *menu, Gamepad *gp)
     }
 
     if (backPressed && screen != SCREEN_MENU)
+    {
+        if (screen == SCREEN_PING_PONG)
+        {
+            CanMessage msg = { .id = CAN_ID_GOAL, .length = 1, .data = { 1 }};
+            can_send(&msg);
+        }
         screen = SCREEN_MENU;
+    }
 
     /* Raw values are used above; calibrated values go out over CAN */
     if (cd.valid)

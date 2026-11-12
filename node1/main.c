@@ -51,6 +51,7 @@ int main()
     Gamepad gp;
     volatile char *adc_mmio = (char *) 0x1000; 
     CalibrationData cd;
+    cd.valid = 0;
     // calibrate(adc_mmio, &cd);
 
     screensaverInit();
@@ -75,7 +76,11 @@ int main()
 
     for (EVER)
     {
-        readGamepadSPI(&gp);
+        if (cd.valid)
+            readCalibratedSPI(&cd, &gp);
+        else
+            readGamepadSPI(&gp);
+
         stateUpdate(&state, &gp);
     }
 }
